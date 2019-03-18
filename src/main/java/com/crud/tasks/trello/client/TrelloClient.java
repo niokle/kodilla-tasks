@@ -2,8 +2,8 @@ package com.crud.tasks.trello.client;
 
 import com.crud.tasks.config.TrelloConfig;
 import com.crud.tasks.domain.CreatedTrelloCard;
-import com.crud.tasks.domain.TrelloBoardDto;
-import com.crud.tasks.domain.TrelloCardDto;
+import com.crud.tasks.dto.TrelloBoardDto;
+import com.crud.tasks.dto.TrelloCardDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -22,6 +22,11 @@ public class TrelloClient {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    public TrelloClient(TrelloConfig trelloConfig, RestTemplate restTemplate) {
+        this.trelloConfig = trelloConfig;
+        this.restTemplate = restTemplate;
+    }
 
     public List<TrelloBoardDto> getTrelloBoards() {
         URI url = getUrl();
