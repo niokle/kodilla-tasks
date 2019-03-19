@@ -23,11 +23,6 @@ public class TrelloClient {
     @Autowired
     private RestTemplate restTemplate;
 
-    public TrelloClient(TrelloConfig trelloConfig, RestTemplate restTemplate) {
-        this.trelloConfig = trelloConfig;
-        this.restTemplate = restTemplate;
-    }
-
     public List<TrelloBoardDto> getTrelloBoards() {
         URI url = getUrl();
 
