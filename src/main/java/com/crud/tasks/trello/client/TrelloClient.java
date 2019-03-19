@@ -4,18 +4,24 @@ import com.crud.tasks.config.TrelloConfig;
 import com.crud.tasks.domain.CreatedTrelloCard;
 import com.crud.tasks.dto.TrelloBoardDto;
 import com.crud.tasks.dto.TrelloCardDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 @Component
 public class TrelloClient {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrelloClient.class);
 
     @Autowired
     private TrelloConfig trelloConfig;
@@ -26,9 +32,14 @@ public class TrelloClient {
     public List<TrelloBoardDto> getTrelloBoards() {
         URI url = getUrl();
 
-        Optional<TrelloBoardDto[]> trelloBoardDtos = Optional.ofNullable(restTemplate.getForObject(url, TrelloBoardDto[].class));
+        try {
+            Optional<TrelloBoardDto[]> trelloBoardDtos = Optional.ofNullable(restTemplate.getForObject(url, TrelloBoardDto[].class));
 
-        return Arrays.asList(trelloBoardDtos.orElse(new TrelloBoardDto[0]));
+            return Arrays.asList(trelloBoardDtos.orElse(new TrelloBoardDto[0]));
+        } catch (RestClientException e) {
+            LOGGER.error(e.getMessage(), e);
+            return new ArrayList<>();
+        }
     }
 
     public URI getUrl() {
