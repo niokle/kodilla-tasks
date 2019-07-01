@@ -1,11 +1,15 @@
 package com.crud.tasks.service;
 
 import com.crud.tasks.config.AdminConfig;
+import com.crud.tasks.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MailCreatorService {
@@ -13,10 +17,18 @@ public class MailCreatorService {
     AdminConfig adminConfig;
 
     @Autowired
+    TaskRepository taskRepository;
+
+    @Autowired
     @Qualifier("templateEngine")
     private TemplateEngine templateEngine;
 
     public String buildTrelloCardEmail(String message) {
+        List<String> functionality = new ArrayList<>();
+        functionality.add("You can manage your tasks");
+        functionality.add("Provides connection with Trello Account");
+        functionality.add("Applocation allows sending tasks to Trello");
+
         Context context = new Context();
         context.setVariable("message", message);
         context.setVariable("tasks_url", "http://localhost:8888/tasks_frontend/");
@@ -26,6 +38,27 @@ public class MailCreatorService {
         context.setVariable("company_name", adminConfig.getCompanyName());
         context.setVariable("company_email", "email: " + adminConfig.getCompanyEmail());
         context.setVariable("company_phone", "phone: " + adminConfig.getCompanyPhone());
+        context.setVariable("show_button", false);
+        context.setVariable("is_friend", false);
+        context.setVariable("admin_config", adminConfig);
+        context.setVariable("application_functionality", functionality);
         return templateEngine.process("mail/created-trello-card-mail", context);
+    }
+
+    public String buildDailyTasksEmail(String message) {
+        List<String> tasks = new ArrayList<>();
+        taskRepository.findAll().stream()
+                .forEach(task -> tasks.add(task.getTitle()));
+
+        Context context = new Context();
+        context.setVariable("message", message);
+        context.setVariable("tasks_url", "http://localhost:8888/tasks_frontend/");
+        context.setVariable("button", "Visit tasks website");
+        context.setVariable("goodbye_message", "Thank you " + adminConfig.getAdminName() + ", bye ;-)");
+        context.setVariable("show_button", true);
+        context.setVariable("is_friend", false);
+        context.setVariable("admin_config", adminConfig);
+        context.setVariable("tasks_list", tasks);
+        return templateEngine.process("mail/daily-tasks-mail", context);
     }
 }
