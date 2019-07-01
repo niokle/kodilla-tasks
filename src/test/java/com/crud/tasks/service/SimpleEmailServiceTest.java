@@ -7,9 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 
+import static org.mockito.Matchers.refEq;
 import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -26,18 +27,12 @@ public class SimpleEmailServiceTest {
         //given
         Mail mail = new Mail("test@test.com", "test2@test.com", "test", "to jest test");
 
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setTo(mail.getMailTo());
-        simpleMailMessage.setSubject(mail.getSubject());
-        simpleMailMessage.setText(mail.getMessage());
-        if (!mail.getToCc().isEmpty()) {
-            simpleMailMessage.setCc(mail.getToCc());
-        }
+        MimeMessagePreparator mimeMessagePreparator = simpleEmailService.createMimeMessage(mail);
 
         //when
         simpleEmailService.send(mail);
 
         //then
-        Mockito.verify(javaMailSender, times(1)).send(simpleMailMessage);
+        Mockito.verify(javaMailSender, times(1)).send(refEq(mimeMessagePreparator));
     }
 }

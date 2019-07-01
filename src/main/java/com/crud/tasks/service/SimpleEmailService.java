@@ -25,9 +25,6 @@ public class SimpleEmailService {
     public void send(final Mail mail) {
         LOGGER.info("Starting email preparation...");
         try {
-            //todo
-            //SimpleMailMessage simpleMailMessage = createMailMessage(mail);
-            //javaMailSender.send(simpleMailMessage);
             javaMailSender.send(createMimeMessage(mail));
             LOGGER.info("Email has been sent.");
         } catch (MailException e) {
@@ -45,7 +42,7 @@ public class SimpleEmailService {
         }
     }
 
-    private MimeMessagePreparator createMimeMessage(final Mail mail) {
+    public MimeMessagePreparator createMimeMessage(final Mail mail) {
         return mimeMessage -> {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
             mimeMessageHelper.setTo(mail.getMailTo());
